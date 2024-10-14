@@ -8,7 +8,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import PageNumberPagination
 from django.core.cache import cache
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, post_delete
 from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
@@ -81,10 +81,18 @@ class CandidateTimestampViewSet(viewsets.ModelViewSet):
             logger.error(f"Error in list view: {str(e)}")
             return Response({"error": "An unexpected error occurred"}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-@receiver(post_save, sender=CandidateTimestamp)
-def invalidate_cache(sender, instance, **kwargs):
+    def perform_destroy(self, instance):
+        super().perform_destroy(instance)
+        invalidate_cache()
+
+def invalidate_cache():
     try:
         cache.clear()
-        logger.info("Cache cleared due to new CandidateTimestamp data")
+        logger.info("Cache cleared due to CandidateTimestamp data change")
     except Exception as e:
         logger.error(f"Error clearing cache: {str(e)}")
+        
+@receiver(post_save, sender=CandidateTimestamp)
+@receiver(post_delete, sender=CandidateTimestamp)
+def handle_data_change(sender, instance, **kwargs):
+    invalidate_cache()
