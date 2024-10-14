@@ -7,6 +7,7 @@ class CandidateTimestamp(models.Model):
     value = models.IntegerField(
         validators=[MinValueValidator(-1000000), MaxValueValidator(1000000)]
     )
+    
     year = models.IntegerField(validators=[MinValueValidator(1900), MaxValueValidator(9999)])
     month = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(12)])
     day = models.IntegerField(validators=[MinValueValidator(1), MaxValueValidator(31)])

@@ -3,7 +3,7 @@ from collections import defaultdict
 from rest_framework import viewsets, status
 from rest_framework.response import Response
 from .models import CandidateTimestamp
-from .serializers import CandidateTimestampSerializer, StructuredCandidateTimestampSerializer
+from .serializers import CandidateTimestampSerializer
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import OrderingFilter
 from rest_framework.pagination import PageNumberPagination
@@ -12,7 +12,7 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 
 logger = logging.getLogger(__name__)
-CACHE_TIMEOUT = 60*5 # 5 minutes
+CACHE_TIMEOUT = 60*60*24 # 1 day
 
 class StandardResultsSetPagination(PageNumberPagination):
     page_size = 100
@@ -29,30 +29,14 @@ class CandidateTimestampViewSet(viewsets.ModelViewSet):
 
     def restructure_data(self, nested_data):
         structured_data = defaultdict(lambda: defaultdict(list))
-
         for item in nested_data:
-            for year, months in item.items():
-                for month_entry in months:
-                    for month, timestamps in month_entry.items():
-                        for timestamp_entry in timestamps:
-                            for timestamp, value in timestamp_entry.items():
-                                structured_data[year][month].append({timestamp: value})
-
-        final_output = []
-    
-        for year, year_data in sorted(structured_data.items()):
-            month_list = []
-            for month, month_data in sorted(year_data.items()):
-                month_list.append({str(month).zfill(2): month_data})
-            
-            final_output.append({str(year): month_list})
-        
-        return final_output
-
-    def get_serializer_class(self):
-        if self.action == 'list':
-            return StructuredCandidateTimestampSerializer
-        return CandidateTimestampSerializer
+            structured_data[item.year][item.month].append({
+                item.timestamp.strftime('%H:%M:%S'): item.value
+            })
+        result = []
+        for item in structured_data:
+            result.append({item: [{i: structured_data[item][i]} for i in structured_data[item]]})
+        return result
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -84,17 +68,13 @@ class CandidateTimestampViewSet(viewsets.ModelViewSet):
             page = self.paginate_queryset(queryset)
             
             if page is not None:
-                serializer = self.get_serializer(page, many=True)
-                data = serializer.data
-                structured_data = self.restructure_data(data)
+                structured_data = self.restructure_data(list(page))
                 response_data = self.get_paginated_response(structured_data).data
                 response_data['results'] = structured_data
                 cache.set(cache_key, response_data, timeout=CACHE_TIMEOUT)
                 return Response(response_data)
             else:
-                serializer = self.get_serializer(queryset, many=True)
-                data = serializer.data
-                structured_data = self.restructure_data(data)
+                structured_data = self.restructure_data(list(queryset))
                 cache.set(cache_key, structured_data, timeout=CACHE_TIMEOUT)
                 return Response(structured_data)
         except Exception as e:

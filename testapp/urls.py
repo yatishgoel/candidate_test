@@ -4,8 +4,6 @@ from .views import CandidateTimestampViewSet
 
 
 router = DefaultRouter()
-# router.register(r'fronted', TimestampedValuesViewSet ,basename="fronted")
-# router.register(r'detailed', DetailedTimestampedValuesViewSet, basename="detailed")
 router.register(r'fronted', CandidateTimestampViewSet, basename="fronted")
 
 

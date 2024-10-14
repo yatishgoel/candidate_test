@@ -34,28 +34,3 @@ class CandidateTimestampSerializer(serializers.ModelSerializer):
             setattr(instance, attr, value)
         instance.save()
         return instance
-
-class StructuredCandidateTimestampSerializer(serializers.Serializer):
-    @staticmethod
-    def get_structured_data(data):
-        structured_data = defaultdict(lambda: defaultdict(list))
-
-        # Ensure data is always a list
-        if not isinstance(data, (list, tuple)):
-            data = [data]
-
-        for item in data:
-            year = item.timestamp.year
-            month = item.timestamp.month
-            timestamp = item.timestamp.strftime('%Y/%m/%d , %H:%M:%S')
-            value = item.value
-
-            structured_data[year][month].append({timestamp: value})
-
-        return [
-            {year: [{month: month_data} for month, month_data in sorted(year_data.items())]}
-            for year, year_data in sorted(structured_data.items())
-        ]
-
-    def to_representation(self, instance):
-        return self.get_structured_data(instance)[0]
