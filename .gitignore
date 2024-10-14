@@ -1,0 +1,107 @@
+# Python/Django related ignores
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Django migrations
+**/migrations/
+
+# Django static files
+staticfiles/
+
+# Local environment variables
+.env
+
+# Virtual environment (venv)
+venv/
+env/
+
+# macOS specific
+.DS_Store
+
+# pyenv
+.python-version
+
+# log files
+*.log
+
+# Coverage reports
+htmlcov/
+.coverage
+*.cover
+.hypothesis/
+
+# MyPy
+.mypy_cache/
+.dmypy.json
+.dmypy/
+
+# Pyre type checker
+.pyre/
+
+# pytest
+.pytest_cache/
+
+# SQLite database
+*.sqlite3
+
+# Unit test / coverage reports
+*.coverage
+
+# Other coverage reports
+*.cover
+coverage.xml
+
+# System files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# VSCode settings (optional)
+.vscode/
+
+# Node.js related ignores (for React frontend)
+
+# Node modules
+node_modules/
+
+# Build output
+build/
+dist/
+
+# npm-debug files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Parcel-bundler cache (if using it)
+.cache/
+
+# Next.js
+.next/
+
+# Testing directories
+coverage/
+jest/
+jest-cache/
+jest-debug.log
+
+# Lint and formatter output
+.eslintcache
+stylelintcache/
+
+# Package lock files
+package-lock.json
+yarn.lock
+
+# Lock files
+*.lock
+
+# Temporary files
+*.tmp
+*.temp
