@@ -16,7 +16,6 @@ A Django REST Framework application for managing and retrieving timestamped valu
    ```
    python -m venv venv
    source venv/bin/activate  # On Windows use `venv\Scripts\activate`
-   pip install -r requirements.txt
    ```
 
 2. Set up the database:
@@ -29,18 +28,18 @@ A Django REST Framework application for managing and retrieving timestamped valu
    python manage.py runserver
    ```
 
-The API will be available at `http://localhost:8000/candidate_test/frontend/`.
+The API will be available at `http://localhost:8000/candidate_test/fronted/`.
 
 ## Usage
 
-Access the API at `/candidate_test/frontend/` to interact with the TimestampedValues data.
+Access the API at `/candidate_test/fronted/` to interact with the TimestampedValues data.
 
 ## Caching
 
 The application implements a caching strategy to improve performance:
 - Cache is automatically warmed on the first request
 - Cached data is used for subsequent requests
-- Cache is updated when new data is added or updated
+- Cache is updated when new data is added or updated or deleted
 
 ## Configuration
 
